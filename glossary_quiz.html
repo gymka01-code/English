@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyber Glossary — Тренажёр терминов</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #060a0f;
+  --surf:    #0c1219;
+  --surf2:   #111b26;
+  --border:  #1a2d3f;
+  --acc:     #00d4ff;
+  --acc2:    #00ff9d;
+  --warn:    #ff6b35;
+  --err:     #ff3d6b;
+  --ok:      #00ff9d;
+  --text:    #c8dde8;
+  --muted:   #4a6a80;
+  --mono:    'Share Tech Mono', monospace;
+  --sans:    'Exo 2', sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+
+body {
+  font-family:var(--sans);
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  padding:20px 16px 48px;
+  display:flex;
+  justify-content:center;
+  background-image:
+    radial-gradient(ellipse 70% 50% at 10% 5%, rgba(0,212,255,.06) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 60% at 90% 90%, rgba(0,255,157,.04) 0%,transparent 60%);
+}
+
+.wrap{max-width:860px;width:100%}
+
+/* ── HEADER ── */
+header{text-align:center;margin-bottom:24px;position:relative}
+.hdr-line{font-family:var(--mono);font-size:.7rem;color:var(--muted);letter-spacing:.15em;margin-bottom:6px}
+h1{
+  font-size:clamp(1.5rem,4vw,2.2rem);
+  font-weight:800;
+  letter-spacing:-.01em;
+  color:#fff;
+  text-shadow:0 0 30px rgba(0,212,255,.4);
+}
+h1 span{color:var(--acc)}
+.sub{font-family:var(--mono);font-size:.78rem;color:var(--muted);margin-top:5px}
+
+/* ── MODE TOGGLE ── */
+.mode-bar{
+  display:flex;justify-content:center;gap:0;
+  margin-bottom:18px;border:1px solid var(--border);border-radius:10px;overflow:hidden;
+  max-width:340px;margin-left:auto;margin-right:auto;
+}
+.mode-btn{
+  flex:1;padding:9px 0;font-family:var(--mono);font-size:.78rem;
+  background:var(--surf);border:none;color:var(--muted);cursor:pointer;
+  transition:all .2s;letter-spacing:.05em;
+}
+.mode-btn:first-child{border-right:1px solid var(--border)}
+.mode-btn.active{background:var(--acc);color:#000;font-weight:700}
+.mode-btn:hover:not(.active){background:var(--surf2);color:var(--text)}
+
+/* ── STATS ── */
+.stats{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));
+  gap:8px;margin-bottom:16px;
+}
+.stat{
+  background:var(--surf);border:1px solid var(--border);border-radius:10px;
+  padding:9px 12px;text-align:center;
+}
+.stat-l{font-family:var(--mono);font-size:.62rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.stat-v{font-family:var(--mono);font-size:1.1rem;color:var(--acc);margin-top:2px;font-weight:700}
+
+/* ── PROGRESS ── */
+.prog-wrap{height:3px;background:var(--border);border-radius:99px;margin-bottom:16px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:99px;transition:width .4s ease}
+
+/* ── FILTERS ── */
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;justify-content:center}
+.f-btn{
+  font-family:var(--mono);font-size:.68rem;padding:4px 11px;
+  border-radius:20px;border:1px solid var(--border);
+  background:var(--surf);color:var(--muted);cursor:pointer;transition:all .18s;
+  letter-spacing:.04em;
+}
+.f-btn:hover,.f-btn.on{border-color:var(--acc);background:rgba(0,212,255,.07);color:var(--acc)}
+
+/* ── CARD ── */
+.card{
+  background:var(--surf);border:1px solid var(--border);border-radius:18px;
+  padding:clamp(18px,4vw,32px);
+  box-shadow:0 0 60px rgba(0,0,0,.6),0 0 0 1px rgba(0,212,255,.04);
+  min-height:420px;display:flex;flex-direction:column;position:relative;overflow:hidden;
+}
+.card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--acc),var(--acc2),transparent);
+  opacity:.5;
+}
+
+/* scan-line aesthetic */
+.card::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);
+  border-radius:18px;
+}
+
+.q-cat{
+  display:inline-block;font-family:var(--mono);font-size:.65rem;
+  padding:3px 10px;border-radius:20px;border:1px solid rgba(0,212,255,.25);
+  background:rgba(0,212,255,.06);color:var(--acc);margin-bottom:14px;
+  letter-spacing:.08em;text-transform:uppercase;
+}
+
+.direction-badge{
+  font-family:var(--mono);font-size:.7rem;color:var(--muted);
+  margin-bottom:10px;letter-spacing:.06em;
+}
+
+.term-box{
+  background:var(--surf2);border:1px solid var(--border);border-radius:12px;
+  padding:18px 22px;margin-bottom:22px;text-align:center;position:relative;
+}
+.term-lang{font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-bottom:6px;letter-spacing:.1em}
+.term-text{
+  font-family:var(--mono);font-size:clamp(1rem,2.8vw,1.4rem);
+  color:#fff;line-height:1.4;text-shadow:0 0 20px rgba(0,212,255,.3);
+}
+
+/* ── OPTIONS ── */
+.opts{display:grid;gap:9px}
+.opt{
+  background:var(--surf2);border:1px solid var(--border);border-radius:10px;
+  padding:13px 16px;cursor:pointer;transition:all .15s;
+  font-family:var(--mono);font-size:.88rem;color:var(--text);
+  text-align:left;display:flex;gap:12px;align-items:flex-start;
+  line-height:1.4;
+}
+.opt-l{
+  min-width:18px;font-size:.7rem;color:var(--muted);
+  padding-top:1px;font-weight:700;transition:color .15s;
+}
+.opt:hover:not([data-lock]){border-color:var(--acc);background:rgba(0,212,255,.06)}
+.opt:hover:not([data-lock]) .opt-l{color:var(--acc)}
+.opt.ok{background:rgba(0,255,157,.08);border-color:var(--ok);color:#e0fff4}
+.opt.ok .opt-l{color:var(--ok)}
+.opt.bad{background:rgba(255,61,107,.08);border-color:var(--err);color:#ffe0e8}
+.opt.bad .opt-l{color:var(--err)}
+
+/* ── FEEDBACK ── */
+.fb{
+  margin-top:14px;padding:12px 15px;
+  background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.15);
+  border-radius:10px;font-family:var(--mono);font-size:.8rem;color:#7ec8e3;
+  line-height:1.5;display:none;
+}
+.fb.show{display:block}
+.fb-ok{border-color:rgba(0,255,157,.2);background:rgba(0,255,157,.05);color:#7effd4}
+.fb-bad{border-color:rgba(255,61,107,.2);background:rgba(255,61,107,.05);color:#ff9db5}
+
+/* ── CONTROLS ── */
+.ctrl{display:flex;justify-content:space-between;align-items:center;padding-top:20px;margin-top:auto;gap:10px}
+.btn{
+  font-family:var(--sans);font-weight:700;font-size:.88rem;
+  padding:10px 20px;border-radius:9px;border:none;cursor:pointer;transition:all .18s;
+}
+.btn-p{background:var(--surf2);border:1px solid var(--border);color:var(--muted)}
+.btn-p:hover{color:var(--text);border-color:var(--acc)}
+.btn-n{background:var(--acc);color:#000}
+.btn-n:disabled{opacity:.3;cursor:not-allowed}
+.btn-n:not(:disabled):hover{background:var(--acc2);box-shadow:0 0 20px rgba(0,212,255,.3)}
+.btn-sh{
+  font-family:var(--mono);font-size:.7rem;padding:7px 13px;
+  border-radius:8px;border:1px solid var(--border);background:none;
+  color:var(--muted);cursor:pointer;transition:all .18s;
+}
+.btn-sh:hover{border-color:var(--acc2);color:var(--acc2)}
+
+/* ── RESULT ── */
+.res{text-align:center;padding:32px 16px}
+.res-score{font-family:var(--mono);font-size:3.5rem;color:var(--acc);text-shadow:0 0 40px rgba(0,212,255,.5)}
+.res-of{font-family:var(--mono);font-size:.85rem;color:var(--muted);margin:4px 0 20px}
+.res-msg{font-size:1rem;margin-bottom:24px;color:var(--text)}
+.btn-res{background:var(--acc);color:#000;padding:12px 30px;font-size:.95rem}
+.mod-scores{margin-top:26px;text-align:left}
+.mod-hdr{font-family:var(--mono);font-size:.65rem;color:var(--muted);letter-spacing:.12em;margin-bottom:12px;text-transform:uppercase}
+.mod-row{display:flex;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);gap:12px;font-family:var(--mono);font-size:.72rem}
+.mod-name{min-width:120px;color:var(--muted)}
+.mod-bar{flex:1;height:5px;background:var(--border);border-radius:99px;overflow:hidden}
+.mod-fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:99px}
+.mod-val{min-width:70px;text-align:right;color:var(--acc2)}
+
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="hdr-line">// CYBERSECURITY GLOSSARY TRAINER v2.0</div>
+  <h1>Cyber <span>Gloss</span>Quiz</h1>
+  <p class="sub">324 термина · 9 категорий · EN ↔ RU</p>
+</header>
+
+<div class="mode-bar">
+  <button class="mode-btn active" id="m-en" onclick="setMode('en')">🇬🇧 EN → RU</button>
+  <button class="mode-btn" id="m-ru" onclick="setMode('ru')">🇷🇺 RU → EN</button>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="stat-l">Категория</div><div class="stat-v" id="s-cat" style="font-size:.75rem;color:var(--acc2)">—</div></div>
+  <div class="stat"><div class="stat-l">Вопрос</div><div class="stat-v"><span id="s-cur">0</span>/<span id="s-tot">0</span></div></div>
+  <div class="stat"><div class="stat-l">Верно</div><div class="stat-v" id="s-sc">0</div></div>
+  <div class="stat"><div class="stat-l">Точность</div><div class="stat-v" id="s-pct">—</div></div>
+</div>
+
+<div class="prog-wrap"><div class="prog-fill" id="prog" style="width:0%"></div></div>
+
+<div class="filters" id="filters"></div>
+
+<div class="card" id="card">
+  <div id="qa"></div>
+  <div class="fb" id="fb"></div>
+  <div class="ctrl">
+    <button class="btn btn-p" onclick="prevQ()">← Назад</button>
+    <button class="btn-sh" onclick="reshuf()">⇄ Перемешать</button>
+    <button class="btn btn-n" id="nxt" onclick="nextQ()" disabled>Далее →</button>
+  </div>
+</div>
+
+<div class="card hidden" id="res-card">
+  <div class="res">
+    <div class="res-score" id="r-sc"></div>
+    <div class="res-of" id="r-of"></div>
+    <div class="res-msg" id="r-msg"></div>
+    <button class="btn btn-res" onclick="restart()">Начать заново</button>
+    <div class="mod-scores" id="r-mods"></div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<script>
+// ─── DATA ──────────────────────────────────────────────────────────────────
+// [english, russian, cat_index]
+const CATS = ["Атаки","Вредоносное ПО","Угрозы","Уязвимости","Инциденты","Защита и ИБ","Данные","Хакеры и преступность","Методы и системы"];
+const T = [
+["active attack","активная атака",0],
+["active cyberdefence","активная кибероборона",5],
+["antivirus","антивирус",1],
+["antivirus app","антивирусное приложение",1],
+["anti-virus personnel","персонал антивирусной поддержки",1],
+["anti-virus policy","антивирусная политика",1],
+["antivirus protection","антивирусная защита",1],
+["bacterium","вирус-бактерия",1],
+["bankcard fraud","мошенничество с банковскими картами",7],
+["banker Trojan","банковский троянец",1],
+["behaviour","поведение (вредоносной программы)",8],
+["behavioural anomaly detection (BAD)","обнаружение аномальной активности",8],
+["behaviour blocker","поведенческий блокиратор",8],
+["benign environment","защищенная среда",5],
+["biometric data","биометрические данные",6],
+["biometric identification","биометрическая идентификация",8],
+["black hat hacker","черный (злонамеренный) хакер",7],
+["blacklist","черный список",8],
+["blacklisting","блокировка по черным спискам",8],
+["blackmail","шантаж / вымогательство",7],
+["botnet","ботнет (зобми-сеть)",1],
+["bug bounty","премия за поиск уязвимостей",3],
+["cyber attack","кибератака",0],
+["cyber attacker","кибервзломщик",7],
+["cyberbullying","кибербуллинг (травля в сети)",7],
+["cyber conflict","киберконфликт",7],
+["cybercop","киберполицейский",7],
+["cybercrime","киберпреступность",7],
+["cybercriminal","киберпреступник",7],
+["cybercriminal organization","кибер-ОПГ",7],
+["cyberdefense","кибероборона",5],
+["cyber detective","кибердетектив",7],
+["cyber incident","киберинцидент",4],
+["cyberlaw","интернет-право",7],
+["cyber operation","кибероперация",0],
+["cyber penetration","кибервзлом",0],
+["cyber protection","киберзащита",5],
+["cyber resilience","киберустойчивость",5],
+["cyber risk","киберугроза",2],
+["cybersecurity","кибербезопасность",5],
+["cybersecurity adviser","советник по кибербезопасности",5],
+["cybersecurity analyst","ИБ-аналитик",5],
+["cybersecurity application","ИБ-приложение",5],
+["cybersecurity business","ИБ-бизнес",5],
+["cybersecurity certificate","ИБ-сертификат",5],
+["cybersecurity employer","ИБ-работодатель",5],
+["cybersecurity expert","ИБ-эксперт",5],
+["cybersecurity hardening","усиление кибербезопасности",5],
+["cybersecurity hardening guide","руководство по усилению ИБ",5],
+["cybersecurity incident","ИБ-инцидент",4],
+["cybersecurity infrastructure","ИБ-инфраструктура",5],
+["cybersecurity market","рынок ИБ",5],
+["cybersecurity report","отчет по ИБ",5],
+["cybersecurity researcher","ИБ-исследователь",5],
+["cybersecurity solution","ИБ-решение",5],
+["cybersecurity spending","расходы на кибербезопасность",5],
+["cybersecurity strategy","ИБ-стратегия",5],
+["cybersecurity technology","ИБ-технология",5],
+["cybershenanigans","кибермахинации",7],
+["cybersleuth","киберсыщик",7],
+["data breach","утечка данных",6],
+["data leakage","кража/утечка данных",6],
+["data privacy","конфиденциальность данных",6],
+["data security","безопасность данных",6],
+["defense in depth","эшелонированная защита",5],
+["destruction","уничтожение (данных)",6],
+["disclose information","разглашать информацию",6],
+["disclosure","раскрытие / утечка информации",6],
+["DMZ","демилитаризованная зона",5],
+["downgrade","понижение уровня секретности",6],
+["DPaaS","защита данных как услуга",6],
+["DSO","офицер по безопасности данных",5],
+["eavesdropping","прослушка / перехват",0],
+["eavesdropping attack","атака перехватом",0],
+["electronic warfare","радиоэлектронная борьба (РЭБ)",0],
+["encrypted software","зашифрованное ПО",8],
+["enterprise security","корпоративная безопасность",5],
+["entrapment","подстава / хакерская ловушка",7],
+["evidence","улика / цифровое доказательство",7],
+["exculpatory evidence","доказательство невиновности",7],
+["external security testing","внешнее ИБ-тестирование",5],
+["false negative","ложноотрицательное срабатывание",8],
+["false positive","ложноположительное срабатывание",8],
+["file protection","защита файлов",6],
+["file sandboxing","проверка файлов в \"песочнице\"",8],
+["file security","безопасность файлов",6],
+["FIRST","форум команд реагирования на инциденты",4],
+["foothold expansion","закрепление в сети (плацдарм)",0],
+["fraud","мошенничество / фрод",7],
+["GDPR","Регламент ЕС по защите данных",6],
+["grey hat hacker","серый хакер",7],
+["greylist","серый список",8],
+["greyware","серое (нежелательное) ПО",1],
+["guard code","защитный код",5],
+["hacker","хакер",7],
+["hacker attack","хакерская атака",0],
+["hacker group","хакерская группировка",7],
+["hacker-powered security","защита силами белых хакеров",5],
+["hacker threat","хакерская угроза",2],
+["hacking","взлом",7],
+["hacking community","хакерское сообщество",7],
+["hacking spike","всплеск взломов",7],
+["hacking techniques","методы взлома",7],
+["hacking tool","хакерская утилита",7],
+["hardware security","аппаратная безопасность",5],
+["hardware vulnerability","аппаратная уязвимость",3],
+["hardware weakness","аппаратная слабость",3],
+["high impact","сильный ущерб / высокий риск",2],
+["high-impact system","критически важная система",2],
+["high-tech crime","высокотехнологичное преступление",7],
+["honeynet","сеть-приманка",8],
+["honeypot","сервер-ловушка",8],
+["human factor","человеческий фактор",8],
+["hybrid security control","гибридный контроль ИБ",5],
+["ICSA","Международная ассоциация компьютерной безопасности",5],
+["ICAM","система идентификации и контроля доступа",8],
+["identity theft","кража личности (личных данных)",7],
+["impact","ущерб / воздействие",2],
+["impact value","величина ущерба",2],
+["impersonation","подмена личности",7],
+["inadvertent disclosure","случайное разглашение",6],
+["incident","ИБ-инцидент",4],
+["incident diary","журнал инцидентов",4],
+["incident handling","обработка инцидентов",4],
+["incident management","управление инцидентами",4],
+["incident outsourcing","аутсорсинг ИБ-инцидентов",4],
+["incident prevention","предотвращение инцидентов",4],
+["incident reporting","отчетность по инцидентам",4],
+["incident response","реагирование на инциденты",4],
+["incident response plan","план реагирования",4],
+["incident scope","масштаб инцидента",4],
+["incident solving","разрешение инцидента",4],
+["inculpatory evidence","улики (доказательства вины)",7],
+["intruder","нарушитель / взломщик",7],
+["intruder detection","обнаружение нарушителя",5],
+["intrusion","вторжение",0],
+["intrusion attempt","попытка вторжения",0],
+["intrusion detection","обнаружение вторжений",5],
+["intrusion prevention","предотвращение вторжений",5],
+["IPS","система предотвращения вторжений",5],
+["intrusion sensor","датчик вторжения",8],
+["intrusion testing","тест на проникновение",0],
+["intrusion tool","инструмент вторжения",0],
+["IOC","индикатор компрометации",8],
+["IT-related risk","ИТ-риск",2],
+["IT security architecture","архитектура ИТ-безопасности",5],
+["IT security investment","ИБ-инвестиции",5],
+["IT security threat","угроза ИТ-безопасности",2],
+["IT security training","обучение ИБ",5],
+["Kerberos ticket","билет Kerberos",8],
+["key management","управление ключами шифрования",8],
+["KRB","Kerberos",8],
+["labeled security protection","мандатная защита (по меткам)",5],
+["laboratory attack","атака в лабораторных условиях",0],
+["layered defense","эшелонированная защита",5],
+["leakage","утечка данных",6],
+["leakage channel","канал утечки",6],
+["least privilege","принцип минимальных привилегий",8],
+["logical perimeter","логический периметр безопасности",5],
+["loss of data","потеря данных",6],
+["loss prevention","предотвращение потерь",6],
+["low-impact system","система низкого риска",2],
+["malicious","вредоносный",1],
+["malicious act","злонамеренное действие",1],
+["malicious activity","вредоносная активность",1],
+["malicious actor","злоумышленник",7],
+["malicious applets","вредоносные апплеты",1],
+["malicious attack","вредоносная атака",0],
+["malicious behavior","подозрительное поведение",1],
+["malicious circuit","аппаратная закладка",1],
+["malicious code","вредоносный код",1],
+["malicious email","зараженное письмо",1],
+["malicious hacker","злонамеренный хакер",7],
+["malicious item","вредоносный объект",1],
+["malicious logic","вредоносная логика",1],
+["maliciously modified device","модифицированное (взломанное) устройство",1],
+["malware","вредоносное ПО (мэлвер)",1],
+["malware analysis","анализ вредоносного ПО",1],
+["malware analyst","вирусный аналитик",1],
+["malware attack","вирусная атака",0],
+["malware detection","обнаружение вредоносного ПО",1],
+["malware-fighting engine","антивирусный движок",1],
+["malicious file","зараженный файл",1],
+["malware forms of spyware","программы-шпионы",1],
+["malware inspection","проверка на вирусы",1],
+["malware protection","защита от вредоносного ПО",1],
+["malware research","исследование вредоносного ПО",1],
+["malware robots","вредоносные боты",1],
+["malware scanning","антивирусное сканирование",1],
+["malware scanning engine","антивирусный движок",1],
+["malware stealing","кража крипты вирусом",1],
+["man-in-the-browser attack","атака через браузер",0],
+["man-in-the-middle attack","атака \"человек посередине\"",0],
+["man-in-the-mobile attack","атака через телефон",0],
+["manipulative communications deception","дезинформация в сетях",0],
+["moderate impact","средний ущерб",2],
+["moderate-impact system","система среднего риска",2],
+["NVD","Национальная база уязвимостей",3],
+["need-to-know","принцип минимально необходимой информации",8],
+["need-to-know determination","определение уровня доступа",8],
+["network-based attack","сетевая атака",0],
+["obfuscation","запутывание кода (обфускация)",8],
+["off-line attack","офлайн-атака",0],
+["online attack","онлайн-атака",0],
+["operational vulnerability information","сводка об уязвимостях",3],
+["outside threat","внешняя угроза",2],
+["passive attack","пассивная атака (прослушка)",0],
+["passive hiding","пассивное сокрытие информации",8],
+["password","пароль",8],
+["password cracking","взлом паролей",7],
+["password protection","парольная защита",8],
+["penetration testing (pentest)","тестирование на проникновение (пентест)",0],
+["perimeter defense","защита периметра",5],
+["potential impact","возможный ущерб",2],
+["quarantine","карантин",8],
+["red team","аудиторы-атакующие (красная команда)",5],
+["remediation plan","план устранения уязвимостей",3],
+["replay attack","атака повтором перехваченных данных",0],
+["replay attack detection","выявление атаки повтором",0],
+["rule-based security policy","политика безопасности по правилам",5],
+["rules of engagement","правила проведения пентеста",5],
+["secret","секрет / тайна",6],
+["secure web gateway","защищенный веб-шлюз",5],
+["secure web service","безопасный веб-сервис",5],
+["secure wireless network","защищенная Wi-Fi сеть",5],
+["securing","обеспечение безопасности",5],
+["security","безопасность / защита",5],
+["security activity","активная ИБ-защита",5],
+["security administrator","ИБ-администратор",5],
+["security advice","рекомендации по безопасности",5],
+["security analysis","анализ защищенности",5],
+["security analyst","ИБ-аналитик",5],
+["security analytics","ИБ-аналитика",5],
+["security architecture","архитектура ИБ",5],
+["security assessment","оценка защищенности",5],
+["security assessment report","отчет об оценке безопасности",5],
+["security association","согласование мер безопасности",5],
+["security audit","ИБ-аудит",5],
+["security awareness","осведомленность о безопасности",5],
+["security banner","баннер с правилами ИБ",5],
+["security best practices","лучшие практики ИБ",5],
+["security breach","взлом системы безопасности",0],
+["security bug","ошибка безопасности",3],
+["security cable","защитный трос",5],
+["security camera","камера видеонаблюдения",5],
+["security categorization","классификация секретности",5],
+["security category","категория секретности",5],
+["sensitivity","секретность (уязвимость) данных",6],
+["SIEM","система управления ИБ-событиями",8],
+["signature analysis","сигнатурный анализ",8],
+["signature-based scanning","сигнатурное сканирование",8],
+["social engineering","социальная инженерия",7],
+["spillage","утечка секретной информации",6],
+["spyware","шпионское ПО",1],
+["supply chain attack","атака через цепочку поставок",0],
+["tampering","несанкционированное вмешательство / взлом",0],
+["tamper-proof","защищенный от взлома",5],
+["targeted attack","целевая атака (APT)",0],
+["technical security controls","технические средства защиты",5],
+["threat","угроза",2],
+["threat actor","нарушитель (источник угрозы)",2],
+["threat analysis","анализ угроз",2],
+["threat assessment","оценка угроз",2],
+["threat control","контроль угроз",2],
+["threat data","данные об угрозах",2],
+["threat detection","обнаружение угроз",2],
+["threat event","событие угрозы",2],
+["threat identification","выявление угроз",2],
+["threat intelligence","киберразведка",2],
+["threat landscape","ландшафт угроз",2],
+["threat modeling","моделирование угроз",2],
+["threat model space","пространство моделей угроз",2],
+["threat monitoring","мониторинг угроз",2],
+["threat prevention","предотвращение угроз",2],
+["threat probability","вероятность угрозы",2],
+["threat profile","профиль угрозы",2],
+["threat report","отчет об угрозах",2],
+["threat research","исследование угроз",2],
+["threat response","реагирование на угрозы",2],
+["threat scenario","сценарий угрозы",2],
+["threat sensitive","подверженный угрозам",2],
+["threat shifting","смещение вектора угрозы",2],
+["threat source","источник угрозы",2],
+["threat space","пространство угроз",2],
+["threat space search","анализ пространства угроз",2],
+["threat window","окно уязвимости",2],
+["trusted computer system","доверенная система",5],
+["trusted path","доверенный канал связи",5],
+["unknown attack","неизвестная атака",0],
+["untrusted","недоверенный (ненадежный)",8],
+["untrusted process","недоверенный процесс",8],
+["user security function","ИБ-функция пользователя",5],
+["vaccine","программа-вакцина",1],
+["virus","вирус",1],
+["virus attack","вирусная атака",0],
+["virus code","код вируса",1],
+["virus filtering","фильтрация вирусов",1],
+["virus hoax","вирусный фейк",1],
+["virus infection","вирусное заражение",1],
+["virus pattern","шаблон вируса",1],
+["virus protection","антивирусная защита",1],
+["virus-protection software","антивирусное ПО",1],
+["virus reporting","отчет/оповещение о вирусах",1],
+["virus scanner","антивирусный сканер",1],
+["virus scanning schedule","расписание проверки на вирусы",1],
+["virus signature","сигнатура вируса",1],
+["virusware","вирусное ПО",1],
+["vulnerability","уязвимость (брешь)",3],
+["vulnerability analysis","анализ уязвимостей",3],
+["vulnerability assessment","оценка уязвимостей",3],
+["vulnerability blocking","блокирование уязвимостей",3],
+["vulnerability detection","обнаружение уязвимостей",3],
+["vulnerability disclosure","раскрытие уязвимостей",3],
+["war dialing attack","атака прозвоном",0],
+["Web attack","веб-атака",0],
+["Web security","веб-безопасность",5],
+["whaling","целевой VIP-фишинг (\"китобой\")",7],
+["white-box attack","атака \"белого ящика\"",0],
+["white hat hacker","белый (этичный) хакер",7],
+["zero-day protection","защита от угроз нулевого дня",5],
+["zero-day threat detection","выявление угроз нулевого дня",5],
+["zero-day vulnerability","уязвимость нулевого дня",3],
+["zombie computer","компьютер-зомби (бот)",1],
+["zombie network","зомби-сеть (ботнет)",1],
+];
+
+// ─── STATE ──────────────────────────────────────────────────────────────────
+let mode = 'en';       // 'en'→show EN pick RU  |  'ru'→show RU pick EN
+let activeCat = -1;    // -1 = all
+let pool = [];         // question objects
+let idx = 0;
+let score = 0;
+let done = false;
+let modStats = {};     // {catIdx: {right,total}}
+
+const LETTERS = ['A','B','C','D'];
+
+// ─── WRONG ANSWER GENERATION ────────────────────────────────────────────────
+function getWrongs(term, count = 3) {
+  const catIdx = term[2];
+  const correctKey = mode === 'en' ? term[1] : term[0];
+
+  // prefer same category for harder questions
+  let sameCat = T.filter(t => t[2] === catIdx && (mode==='en' ? t[1] : t[0]) !== correctKey);
+  let other   = T.filter(t => t[2] !== catIdx && (mode==='en' ? t[1] : t[0]) !== correctKey);
+
+  // shuffle both
+  sameCat = sameCat.sort(() => Math.random() - .5);
+  other   = other.sort(() => Math.random() - .5);
+
+  // take from same cat first, fill with others
+  const combined = [...sameCat, ...other];
+
+  // deduplicate by answer text (avoid duplicate translations)
+  const seen = new Set([correctKey]);
+  const wrongs = [];
+  for (const t of combined) {
+    const ans = mode === 'en' ? t[1] : t[0];
+    if (!seen.has(ans)) { seen.add(ans); wrongs.push(ans); }
+    if (wrongs.length === count) break;
+  }
+  return wrongs;
+}
+
+// ─── BUILD POOL ──────────────────────────────────────────────────────────────
+function buildPool() {
+  const src = activeCat === -1 ? T : T.filter(t => t[2] === activeCat);
+  pool = src.map(term => {
+    const correct = mode === 'en' ? term[1] : term[0];
+    const wrongs  = getWrongs(term, 3);
+    const opts    = [correct, ...wrongs].sort(() => Math.random() - .5);
+    const ci      = opts.indexOf(correct);
+    return { term, opts, ci };
+  }).sort(() => Math.random() - .5);
+
+  // reset modStats
+  modStats = {};
+  CATS.forEach((_, i) => modStats[i] = {right:0, total:0});
+  pool.forEach(q => modStats[q.term[2]].total++);
+}
+
+// ─── FILTERS UI ──────────────────────────────────────────────────────────────
+function buildFilters() {
+  const el = document.getElementById('filters');
+  const counts = CATS.map((_, i) => T.filter(t => t[2] === i).length);
+  el.innerHTML = '';
+
+  const allBtn = makeBtn(`Все (${T.length})`, -1);
+  el.appendChild(allBtn);
+  CATS.forEach((name, i) => el.appendChild(makeBtn(`${name} (${counts[i]})`, i)));
+}
+
+function makeBtn(label, catVal) {
+  const b = document.createElement('button');
+  b.className = 'f-btn' + (activeCat === catVal ? ' on' : '');
+  b.textContent = label;
+  b.onclick = () => {
+    activeCat = catVal;
+    document.querySelectorAll('.f-btn').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    init();
+  };
+  return b;
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+function init() {
+  idx = 0; score = 0; done = false;
+  buildPool();
+  document.getElementById('s-tot').textContent = pool.length;
+  document.getElementById('s-sc').textContent  = '0';
+  document.getElementById('s-pct').textContent = '—';
+  document.getElementById('res-card').classList.add('hidden');
+  document.getElementById('card').classList.remove('hidden');
+  render();
+}
+
+// ─── RENDER ──────────────────────────────────────────────────────────────────
+function render() {
+  if (idx >= pool.length) { showResult(); return; }
+
+  const {term, opts, ci} = pool[idx];
+  const showTerm  = mode === 'en' ? term[0] : term[1];
+  const showLang  = mode === 'en' ? 'EN' : 'RU';
+  const pickLang  = mode === 'en' ? 'RU' : 'EN';
+  const catName   = CATS[term[2]];
+
+  document.getElementById('nxt').disabled = true;
+  document.getElementById('s-cur').textContent  = idx + 1;
+  document.getElementById('s-cat').textContent  = catName;
+  document.getElementById('prog').style.width   = Math.round((idx / pool.length) * 100) + '%';
+
+  const fb = document.getElementById('fb');
+  fb.textContent = ''; fb.className = 'fb';
+
+  document.getElementById('qa').innerHTML = `
+    <div class="q-cat">${catName}</div>
+    <div class="direction-badge">${showLang} → ${pickLang} &nbsp;·&nbsp; выберите правильный перевод</div>
+    <div class="term-box">
+      <div class="term-lang">${showLang}</div>
+      <div class="term-text">${esc(showTerm)}</div>
+    </div>
+    <div class="opts">
+      ${opts.map((o, i) => `
+        <button class="opt" onclick="pick(this,${i},${ci},'${esc2(mode==='en'?term[0]:term[1])}','${esc2(mode==='en'?term[1]:term[0])}')" data-i="${i}">
+          <span class="opt-l">${LETTERS[i]}</span>
+          <span>${esc(o)}</span>
+        </button>
+      `).join('')}
+    </div>
+  `;
+}
+
+function esc(s)  { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function esc2(s) { return String(s).replace(/'/g,"\\'"); }
+
+// ─── ANSWER ──────────────────────────────────────────────────────────────────
+function pick(el, sel, ci, enTerm, ruTerm) {
+  if (done) return;
+  done = true;
+
+  document.querySelectorAll('.opt').forEach(o => o.setAttribute('data-lock','1'));
+
+  const fb = document.getElementById('fb');
+
+  if (sel === ci) {
+    el.classList.add('ok');
+    score++;
+    modStats[pool[idx].term[2]].right++;
+    document.getElementById('s-sc').textContent = score;
+    fb.textContent = `✓ Верно! ${enTerm} = ${ruTerm}`;
+    fb.className = 'fb show fb-ok';
+  } else {
+    el.classList.add('bad');
+    document.querySelector(`.opt[data-i="${ci}"]`).classList.add('ok');
+    fb.textContent = `✗ Неверно. ${enTerm} → ${ruTerm}`;
+    fb.className = 'fb show fb-bad';
+  }
+
+  const answered = idx + 1;
+  document.getElementById('s-pct').textContent = Math.round((score / answered) * 100) + '%';
+  document.getElementById('nxt').disabled = false;
+}
+
+// ─── NAV ─────────────────────────────────────────────────────────────────────
+function nextQ() { if (!done && idx < pool.length) return; idx++; done=false; render(); }
+function prevQ() { if (idx > 0) { idx--; done=false; render(); } }
+
+function reshuf() {
+  pool = pool.sort(() => Math.random() - .5);
+  idx = 0; score = 0; done = false;
+  Object.values(modStats).forEach(v => { v.right = 0; });
+  document.getElementById('s-sc').textContent  = '0';
+  document.getElementById('s-pct').textContent = '—';
+  render();
+}
+
+// ─── MODE ─────────────────────────────────────────────────────────────────────
+function setMode(m) {
+  mode = m;
+  document.getElementById('m-en').classList.toggle('active', m==='en');
+  document.getElementById('m-ru').classList.toggle('active', m==='ru');
+  init();
+}
+
+// ─── RESULT ──────────────────────────────────────────────────────────────────
+function showResult() {
+  document.getElementById('card').classList.add('hidden');
+  const rc = document.getElementById('res-card');
+  rc.classList.remove('hidden');
+
+  const total = pool.length;
+  const pct   = Math.round((score / total) * 100);
+
+  document.getElementById('r-sc').textContent  = `${score}/${total}`;
+  document.getElementById('r-of').textContent  = `${pct}% правильных ответов`;
+
+  const msgs = [
+    [90, '🏆 Отлично! Вы знаете эту терминологию как профессионал.'],
+    [75, '💪 Хорошо! Ещё немного практики — и будет идеально.'],
+    [55, '📖 Неплохо. Повторите слабые категории.'],
+    [0,  '🔄 Нужно ещё позаниматься. Запустите тест снова!'],
+  ];
+  document.getElementById('r-msg').textContent = msgs.find(([t]) => pct >= t)[1];
+
+  const activeMods = CATS.map((name, i) => ({name, i, ...modStats[i]}))
+    .filter(m => m.total > 0)
+    .sort((a, b) => b.total - a.total);
+
+  document.getElementById('r-mods').innerHTML = `
+    <div class="mod-hdr">// результаты по категориям</div>
+    ${activeMods.map(({name, right, total}) => {
+      const p = Math.round((right/total)*100);
+      return `<div class="mod-row">
+        <span class="mod-name">${name}</span>
+        <div class="mod-bar"><div class="mod-fill" style="width:${p}%"></div></div>
+        <span class="mod-val">${right}/${total} (${p}%)</span>
+      </div>`;
+    }).join('')}
+  `;
+}
+
+function restart() {
+  document.getElementById('res-card').classList.add('hidden');
+  init();
+}
+
+// ─── START ───────────────────────────────────────────────────────────────────
+buildFilters();
+init();
+</script>
+</body>
+</html>
